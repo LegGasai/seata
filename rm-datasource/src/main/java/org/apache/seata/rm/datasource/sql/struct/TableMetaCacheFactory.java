@@ -30,6 +30,7 @@ import org.apache.seata.common.ConfigurationKeys;
 import org.apache.seata.common.loader.EnhancedServiceLoader;
 import org.apache.seata.common.thread.NamedThreadFactory;
 import org.apache.seata.common.util.CollectionUtils;
+import org.apache.seata.common.util.StringUtils;
 import org.apache.seata.config.ConfigurationFactory;
 import org.apache.seata.rm.datasource.DataSourceProxy;
 import org.apache.seata.sqlparser.struct.TableMetaCache;
@@ -168,8 +169,13 @@ public class TableMetaCacheFactory {
          * @return true if the exception indicates the data source is closed; false otherwise
          */
         private boolean isDataSourceClosedException(SQLException ex) {
-            String message = ex.getMessage();
-            return message != null && message.contains("closed");
+            String message = ex.getMessage().toLowerCase();
+            String sqlState = ex.getSQLState();
+            // Most jdbc drivers use '08006' as the datasource close code.
+            if ("08006".equals(sqlState)) {
+                return true;
+            }
+            return StringUtils.isNotBlank(message) && message.contains("datasource") && message.contains("close");
         }
     }
 }
