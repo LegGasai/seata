@@ -142,7 +142,7 @@ public class TableMetaCacheFactory {
                             }
                             lastRefreshFinishTime = System.nanoTime();
                         }
-                    }catch (SQLException ex) {
+                    } catch (SQLException ex) {
                         if (isDataSourceClosedException(ex)) {
                             LOGGER.info("DataSource is closed, exiting refresh task for resourceId: {}", dataSource.getResourceId());
                             removeHolderFromMap(dataSource.getResourceId());
