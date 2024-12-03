@@ -169,8 +169,5 @@ public class TableMetaCacheFactory {
             String message = ex.getMessage();
             return message != null && message.contains("closed");
         }
-
-
-
     }
 }
