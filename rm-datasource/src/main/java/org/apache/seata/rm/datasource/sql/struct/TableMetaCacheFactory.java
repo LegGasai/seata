@@ -148,7 +148,9 @@ public class TableMetaCacheFactory {
                             removeHolderFromMap(dataSource.getResourceId());
                             return;
                         } else {
+                            // other error, avoid high CPU usage due to infinite loops caused by database exceptions
                             LOGGER.error("Table refresh SQL error: {}", ex.getMessage(), ex);
+                            lastRefreshFinishTime = System.nanoTime();
                         }
                     } catch (Exception exx) {
                         LOGGER.error("table refresh error:{}", exx.getMessage(), exx);
