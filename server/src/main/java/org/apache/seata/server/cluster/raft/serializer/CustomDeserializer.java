@@ -17,6 +17,9 @@
 package org.apache.seata.server.cluster.raft.serializer;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -31,12 +34,24 @@ public class CustomDeserializer extends JsonDeserializer<Class<?>> {
 
     String permitPackage = "org.apache.seata";
 
+    List<String> permitClass = Arrays.asList(
+            "java.util.Map",
+            "java.util.HashMap",
+            "java.util.LinkedHashMap"
+    );
     @Override
     public Class<?> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
         throws IOException {
         String className = jsonParser.getValueAsString();
         if (className.startsWith(oldPackage)) {
             className = className.replaceFirst(oldPackage, currentPackage);
+        }
+        if (permitClass.contains(className)) {
+            try {
+                return Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
         }
         if (className.startsWith(permitPackage)) {
             try {
